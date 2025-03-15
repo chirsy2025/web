@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>极简科学计算器</title>
+    <style>
+        /* 现代渐变背景风格 */
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a8a5e6;
+            --accent: #ff7675;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            transition: transform 0.3s;
+        }
+
+        .calculator:hover {
+            transform: translateY(-5px);
+        }
+
+        #display {
+            width: 100%;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 2.5rem;
+            text-align: right;
+            border: none;
+            border-radius: 10px;
+            background: #f8f9fa;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        button {
+            padding: 1.2rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .operator {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .equal {
+            background: var(--accent);
+            color: white;
+            grid-column: span 2;
+        }
+
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 1rem;
+                margin: 1rem;
+            }
+            
+            button {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" readonly>
+        <div class="buttons">
+            <button onclick="clearDisplay()">C</button>
+            <button onclick="appendToDisplay('(')">(</button>
+            <button onclick="appendToDisplay(')')">)</button>
+            <button class="operator" onclick="appendToDisplay('/')">/</button>
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('*')">×</button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button class="equal" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        
+        // 优雅的计算逻辑处理
+        const calculate = () => {
+            try {
+                let expression = display.value
+                    .replace(/×/g, '*')
+                    .replace(/÷/g, '/');
+                
+                // 安全计算
+                if(/^[0-9+\-*/(). ]+$/.test(expression)) {
+                    display.value = eval(expression);
+                } else {
+                    throw new Error('无效输入');
+                }
+            } catch (error) {
+                display.value = '错误';
+                setTimeout(() => clearDisplay(), 1000);
+            }
+        }
+
+        const appendToDisplay = (value) => {
+            if(display.value === '错误') clearDisplay();
+            display.value += value;
+        }
+
+        const clearDisplay = () => {
+            display.value = '';
+        }
+
+        // 键盘支持
+        document.addEventListener('keydown', (e) => {
+            if(e.key >= '0' && e.key <= '9' || '+-*/().'.includes(e.key)) {
+                appendToDisplay(e.key);
+            } else if(e.key === 'Enter') {
+                calculate();
+            } else if(e.key === 'Backspace') {
+                display.value = display.value.slice(0, -1);
+            }
+        });
+    </script>
+</body>
+</html>
